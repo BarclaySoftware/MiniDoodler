@@ -24,3 +24,6 @@
 - [ ] Open images
 - [ ] More stroke options (i.e., textures)
 - [ ] Add more extras
+- [ ] Add undo/redo features
+- [ ] Add zoom in/out features
+- [ ] Add element moving features
