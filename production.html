@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing App</title>
+    <style>
+        @font-face {
+            font-family: 'Saison Print Bold';
+            src: url(https://delivercdn.pages.dev/evermore/Saison/SaisonWritten.ttf);
+        }
+        
+        body, html {
+            font-family: 'Saison Print Bold';
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        canvas {
+            touch-action: none;
+            width: 100%;
+            height: calc(100% - 60px); /* Adjusted to fit the toolbar */
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            border-top: 2px solid #ffa312; /* Red border at the top of the toolbar */
+            background-color: black;
+        }
+        
+        #colorPicker {
+            background-color: #ffa312;
+            margin: 0 5px;
+            padding: 2px;
+            border-radius: 6px;
+            height: 40px;
+        }
+        
+        #brushSize {
+            appearance: none;
+            outline: none;
+            background: #1e1c21;
+            margin: 0 5px;
+            width: 600px;
+            border-radius: 10px;
+            padding: 0px;
+            height: 40px;
+            position: relative;
+        }
+        
+        #brushSize::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            background: #ffa312;
+            cursor: pointer;
+        }
+        
+        .tooltip {
+            font-family: 'Saison Print Bold';
+            position: absolute;
+            background: #ffa312;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        
+        button {
+            font-family: 'Saison Print Bold';
+            font-weight: bold;
+            background-color: #ffa312;
+            border: none;
+            border-radius: 6px;
+            margin: 0 5px;
+            padding: 10px;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="drawingCanvas"></canvas>
+        <div class="toolbar">
+            <input type="color" id="colorPicker" value="#000000">
+            <div style="position: relative;">
+                <input type="range" id="brushSize" min="1" max="100" value="5">
+                <div class="tooltip" id="tooltip">5 px</div>
+            </div>
+            <button id="clearCanvas">Clear</button>
+            <button id="saveDrawing">Save</button>
+            <button id="eraseMode">Erase</button>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const brushSize = document.getElementById('brushSize');
+        const tooltip = document.getElementById('tooltip');
+        const clearCanvasButton = document.getElementById('clearCanvas');
+        const saveDrawingButton = document.getElementById('saveDrawing');
+        const eraseModeButton = document.getElementById('eraseMode');
+        
+        let eraseMode = false;
+        
+        function resizeCanvas() {
+            const toolbarHeight = document.querySelector('.toolbar').offsetHeight;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - toolbarHeight;
+        }
+        
+        resizeCanvas();
+        
+        let painting = false;
+        
+        function startPosition(e) {
+            painting = true;
+            drawOrErase(e);
+        }
+        
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+        
+        function drawOrErase(e) {
+            if (!painting) return;
+
+            if (eraseMode) {
+                erase(e);
+            } else {
+                draw(e);
+            }
+        }
+        
+        function draw(e) {
+            ctx.lineWidth = brushSize.value;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = colorPicker.value;
+        
+            const pos = getMousePos(e);
+        
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+        
+        function erase(e) {
+            ctx.lineWidth = brushSize.value * 2; // Increase eraser size for better effect
+            ctx.lineCap = 'round';
+            const pos = getMousePos(e);
+        
+            // Use 'destination-out' composite operation to erase
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, brushSize.value, 0, 2 * Math.PI);
+            ctx.fill();
+        
+            ctx.globalCompositeOperation = 'source-over'; // Restore default composite operation
+        }
+        
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left || e.touches[0].clientX - rect.left,
+                y: e.clientY - rect.top || e.touches[0].clientY - rect.top
+            };
+        }
+        
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', drawOrErase);
+        canvas.addEventListener('touchstart', startPosition);
+        canvas.addEventListener('touchend', endPosition);
+        canvas.addEventListener('touchmove', drawOrErase);
+        
+        brushSize.addEventListener('input', () => {
+            tooltip.textContent = `${brushSize.value} px`;
+            tooltip.style.display = 'block';
+            const sliderRect = brushSize.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const sliderWidth = sliderRect.width;
+            const thumbWidth = 40; // Width of the thumb element
+            const thumbOffset = ((brushSize.value - brushSize.min) / (brushSize.max - brushSize.min)) * (sliderWidth - thumbWidth);
+            tooltip.style.left = `calc(${thumbOffset}px + 20px)`; // 20px is half the thumb width to center the tooltip
+        });
+        
+        brushSize.addEventListener('mouseover', () => {
+            tooltip.style.display = 'block';
+        });
+        
+        brushSize.addEventListener('mouseout', () => {
+            tooltip.style.display = 'none';
+        });
+        
+        clearCanvasButton.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+        
+        saveDrawingButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+        
+        eraseModeButton.addEventListener('click', () => {
+            eraseMode = !eraseMode;
+            if (eraseMode) {
+                eraseModeButton.textContent = 'Draw';
+            } else {
+                eraseModeButton.textContent = 'Erase';
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            resizeCanvas();
+            ctx.putImageData(imageData, 0, 0);
+         });
+
+    </script>
+</body>
+</html>

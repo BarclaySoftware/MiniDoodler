@@ -1,0 +1,93 @@
+@font-face {
+    font-family: 'Saison Written Next';
+    src: url(https://delivercdn.pages.dev/evermore/Saison/SaisonWrittenNext.ttf);
+}
+
+body, html {
+    font-family: 'Saison Written Next';
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f0f0;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+canvas {
+    touch-action: none;
+    width: 100%;
+    height: calc(100% - 60px);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    border-top: 2px solid #ffa312;
+    background-color: black;
+}
+
+#colorPicker {
+    background-color: #ffa312;
+    margin: 0 5px;
+    padding: 2px;
+    border-radius: 6px;
+    height: 40px;
+}
+
+#brushSize {
+    appearance: none;
+    outline: none;
+    background: #1e1c21;
+    margin: 0 5px;
+    width: 600px;
+    border-radius: 10px;
+    padding: 0px;
+    height: 40px;
+    position: relative;
+}
+
+#brushSize::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    background: #ffa312;
+    cursor: pointer;
+}
+
+.tooltip {
+    font-family: 'Saison Written Next';
+    position: absolute;
+    background: #ffa312;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+button {
+    font-family: 'Saison Written Next';
+    font-weight: bold;
+    background-color: #ffa312;
+    border: none;
+    border-radius: 6px;
+    margin: 0 5px;
+    padding: 10px;
+    height: 40px;
+}

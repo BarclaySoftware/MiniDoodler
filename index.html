@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniDoodler</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="/MiniDoodler-Icon.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <canvas id="drawingCanvas"></canvas>
+        <div class="toolbar">
+            <input type="color" id="colorPicker" value="#000000">
+            <div style="position: relative;">
+                <input type="range" id="brushSize" min="1" max="100" value="5">
+                <div class="tooltip" id="tooltip">5 px</div>
+            </div>
+            <button id="clearCanvas">Clear</button>
+            <button id="saveDrawing">Save</button>
+            <button id="eraseMode">Erase</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
