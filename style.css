@@ -27,7 +27,7 @@ canvas {
     touch-action: none;
     width: 100%;
     height: calc(100% - 60px);
-    cursor: url('/extras/Cursor-Beta.png'), auto;
+    cursor: url('/extras/Cursor-Beta-Pointer.png'), auto;
 }
 
 .toolbar {
